@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import CustomerLogin from '../pages/Auth/CustomerLogin';
-import CustomerRegister from '../pages/Auth/CustomerRegister';
+import CustomerSignIn from '../pages/Auth/CustomerSignIn';
+import CustomerSignUp from '../pages/Auth/CustomerSignUp';
 import POSLogin from '../pages/Auth/POSLogin';
 import POSHome from '../pages/POS/Home/HomePage';
 import POSManagementOverview from '../pages/POS/Management/Overview';
@@ -12,8 +12,8 @@ export default function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/login" element={<CustomerLogin />} />
-        <Route path="/register" element={<CustomerRegister />} />
+        <Route path="/login" element={<CustomerSignIn />} />
+        <Route path="/register" element={<CustomerSignUp />} />
         <Route path="/pos" element={<POSHome />} />
         <Route path="/pos/login" element={<POSLogin />} />
         <Route path="/pos/management/overview" element={<POSManagementOverview />} />

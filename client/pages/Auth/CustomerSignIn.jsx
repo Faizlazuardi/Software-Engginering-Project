@@ -22,14 +22,14 @@ export default function Login() {
                     </div>
                     <a href="" className="font-bold text-md">Forgot Password?</a>
                 </div>
-                <button className="bg-black rounded-md w-110 h-10 text-white" type="submit">Sign In</button>
+                <button className="bg-black rounded-md w-110 h-10 text-white hover:cursor-pointer" type="submit">Sign In</button>
             </div>
             <p>Or Continue With</p>
             <div className="flex gap-5">
-                <button className="bg-white hover:bg-black border-2 rounded-md w-45 h-12 hover:text-white text-xl" type="submit"><i className="fa-brands fa-google"></i> Google</button>
-                <button className="bg-white hover:bg-black border-2 rounded-md w-45 h-12 hover:text-white text-xl" type="submit"><i className="fa-brands fa-facebook"></i> Facebook</button>
+                <button className="bg-white hover:bg-black border-2 rounded-md w-45 h-12 hover:text-white text-xl hover:cursor-pointer" type="submit"><i className="fa-brands fa-google"></i> Google</button>
+                <button className="bg-white hover:bg-black border-2 rounded-md w-45 h-12 hover:text-white text-xl hover:cursor-pointer" type="submit"><i className="fa-brands fa-facebook"></i> Facebook</button>
             </div>
-            <p>Don’t have an account? <strong><a href="/register">Sign Up</a></strong></p>
+            <p className="hover:cursor-pointer">Don’t have an account? <strong><a href="/register">Sign Up</a></strong></p>
         </div>
     );
 }
