@@ -1,8 +1,8 @@
 import POSNavigation from "../components/POSNavigation";
 
-export default function Products({children}) {
+export default function POSLayout({children}) {
     return (
-        <div className="flex flex-col w-screen h-screen">
+        <div className="flex flex-col w-screen h-screen select-none">
             <POSNavigation />
             {children}
         </div>

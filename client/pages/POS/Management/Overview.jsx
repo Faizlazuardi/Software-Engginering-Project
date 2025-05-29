@@ -133,7 +133,7 @@ export default function Overview() {
                         />
                         </label>
                     </div>
-                    <button type="submit" className="bg-blue-500 p-2 rounded text-white hover:cursor-pointer">
+                    <button type="submit" className="bg-blue-500 p-2 rounded text-white cursor-pointer">
                         Add Product
                     </button>
                     </form>
