@@ -6,7 +6,7 @@ const transactionId = "A9461F";{/*Example transaction number*/}
 export default function Summary() {
     const { cart, subTotal, tax, total } = useCart();
     return (
-        <div className="flex flex-col items-center gap-10 bg-gray-100 mx-auto w-360 h-260">
+        <div className="flex flex-col items-center gap-10 bg-gray-100 w-screen h-screen select-none">
             <CustomerDisplayNavigation />
             <div className="flex flex-col justify-center items-center gap-5 bg-white shadow-lg p-8 rounded-lg w-250">
                 <div className="flex justify-between items-center gap-2 w-full">

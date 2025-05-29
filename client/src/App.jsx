@@ -1,16 +1,16 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import CustomerSignIn from '../pages/Auth/CustomerSignIn';
-import CustomerSignUp from '../pages/Auth/CustomerSignUp';
-import POSLogin from '../pages/Auth/POSLogin';
-import POSHome from '../pages/POS/Home/HomePage';
-import POSManagementOverview from '../pages/POS/Management/Overview';
-import POSManagementProduct from '../pages/POS/Management/Products';
-import POSManagementTransaction from '../pages/POS/Management/Transaction';
-import POSManagementCustomer from '../pages/POS/Management/Customers';
-import CustomerDisplaySummary from '../pages/CustomerDisplay/Summary';
-import CustomerDisplayPayment from '../pages/CustomerDisplay/Payment';
+import CustomerSignIn from '../src/pages/Auth/CustomerSignIn';
+import CustomerSignUp from '../src/pages/Auth/CustomerSignUp';
+import POSLogin from '../src/pages/Auth/POSLogin';
+import POSHome from '../src/pages/POS/Home/HomePage';
+import POSManagementOverview from '../src/pages/POS/Management/Overview';
+import POSManagementProduct from '../src/pages/POS/Management/Products';
+import POSManagementTransaction from '../src/pages/POS/Management/Transaction';
+import POSManagementCustomer from '../src/pages/POS/Management/Customers';
+import CustomerDisplaySummary from '../src/pages/CustomerDisplay/Summary';
+import CustomerDisplayPayment from '../src/pages/CustomerDisplay/Payment';
 
-import { CartProvider } from "../contexts/cartContext";
+import { CartProvider } from "../src/contexts/cartContext";
 
 export default function App() {
   return (

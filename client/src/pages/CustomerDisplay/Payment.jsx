@@ -45,7 +45,7 @@ function CameraFeed() {
 export default function Payment() {
   const { total } = useCart();
   return (
-    <div className="flex flex-col items-center gap-10 bg-gray-100 mx-auto w-360 h-260">
+    <div className="flex flex-col items-center gap-10 bg-gray-100 w-screen h-screen select-none">
         <CustomerDisplayNavigation />
         <div className="flex flex-col justify-center items-center gap-5 bg-white shadow-lg p-8 rounded-lg w-250">
           <h1 className="font-bold text-xl">Total Amount</h1>
