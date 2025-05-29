@@ -22,7 +22,7 @@ export default function Login() {
                     <a href="" className="font-bold text-md">Forgot Password?</a>
                 </div>
                 <button className="bg-black rounded-md w-110 h-10 text-white" type="submit">Sign In</button>
-                <p>Need help? Need help? Contact <strong>System Administrator</strong></p>
+                <p>Need help? Contact <strong>System Administrator</strong></p>
             </div>
         </div>
     );
