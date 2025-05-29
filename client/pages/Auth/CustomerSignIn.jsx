@@ -1,12 +1,17 @@
-import { handleCustomerSignIn } from "../../utils/handleCustomerSignUp";
+import {handleCustomerSignIn} from '../../services/authService';
 
 export default function CustomerSignIn() {
+    const { signInForm, error, loading, handleSignInFormChange, handleSignInSubmit } = handleCustomerSignIn();
+    
     return (
         <div className="flex flex-col justify-center items-center gap-5 bg-gray-100 w-screen h-screen">
-            <form className="flex flex-col justify-center items-center gap-4 bg-white p-8 border-2 rounded-lg w-128 h-150" onSubmit={handleCustomerSignIn}>
+            <form className="flex flex-col justify-center items-center gap-4 bg-white p-8 border-2 rounded-lg w-128 h-150" onSubmit={handleSignInSubmit}>
                 <div className="bg-gray-500 rounded-2xl w-25 h-25"></div>
                 <h1 className="font-bold text-3xl">Welcome To SuperMart</h1>
                 <h1 className="font-thin text-gray-500 text-xl">Sign in to your account</h1>
+                
+                {error && <div className="w-110 text-red-500">{error}</div>}
+                
                 <div className="flex flex-col gap-5">
                     <div className="flex flex-col gap-2.5">
                         <label className="font-bold text-xl" htmlFor="email">Email</label>
@@ -16,8 +21,8 @@ export default function CustomerSignIn() {
                             name="email" 
                             id="email" 
                             placeholder="Enter Your Email"
-                            value={credentials.email}
-                            onChange={handleChange}
+                            value={signInForm.email}
+                            onChange={handleSignInFormChange}
                             required
                         />
                     </div>
@@ -29,8 +34,8 @@ export default function CustomerSignIn() {
                             name="password" 
                             id="password" 
                             placeholder="Enter Your Password"
-                            value={credentials.password}
-                            onChange={handleChange}
+                            value={signInForm.password}
+                            onChange={handleSignInFormChange}
                             required
                         />
                     </div>
@@ -44,7 +49,13 @@ export default function CustomerSignIn() {
                     </div>
                     <a href="" className="font-bold text-md">Forgot Password?</a>
                 </div>
-                <button className="bg-black rounded-md w-110 h-10 text-white hover:cursor-pointer" type="submit">Sign In</button>
+                    <button 
+                        className="bg-black disabled:bg-gray-500 rounded-md w-110 h-10 text-white hover:cursor-pointer" 
+                        type="submit"
+                        disabled={loading}
+                    >
+                        {loading ? 'Signing In...' : 'Sign In'}
+                    </button>
             </form>
             <p>Or Continue With</p>
             <div className="flex gap-5">
