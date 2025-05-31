@@ -51,13 +51,13 @@ exports.searchProducts = async (req, res) => {
 
 exports.createProduct = async (req, res) => {
     try {
-        const { brandId, categoryId, productName, productPrice } = req.body;
+        const { brandId, categoryId, productName, productPrice, productStock } = req.body;
 
         if (!productName || !productPrice || productPrice <= 0) {
             return res.status(400).json({ message: "Product name and valid price are required" });
         }
 
-        const product = await productModel.createProduct(brandId, categoryId, productName, productPrice);
+        const product = await productModel.createProduct(brandId, categoryId, productName, productPrice, productStock);
         res.status(201).json({ 
             message: "Product created successfully", 
             product 
@@ -69,19 +69,22 @@ exports.createProduct = async (req, res) => {
 
 exports.updateProduct = async (req, res) => {
     try {
-        const { productId } = req.params;
-        const updateData = req.body;
+        const productId = req.params.productId;
+        const { brandId, categoryId, productName, productPrice, productStock } = req.body;
 
-        const product = await productModel.updateProduct(productId, updateData);
-        
-        if (!product) {
+        if (!productName || !productPrice || productPrice <= 0 || !productStock || productStock < 0) {
+            return res.status(400).json({ message: "Invalid product data" });
+        }
+
+        const updated = await productModel.updateProduct(productId, {
+            brandId, categoryId, productName, productPrice, productStock
+        });
+
+        if (!updated) {
             return res.status(404).json({ message: "Product not found" });
         }
 
-        res.json({ 
-            message: "Product updated successfully", 
-            product 
-        });
+        res.status(200).json({ message: "Product updated successfully", product: updated });
     } catch (error) {
         res.status(500).json({ message: "Failed to update product" });
     }

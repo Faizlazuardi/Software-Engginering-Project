@@ -49,19 +49,21 @@ exports.searchProducts = async (searchTerm) => {
     return result.rows;
 };
 
-exports.createProduct = async (brandId, categoryId, productName, productPrice) => {
+exports.createProduct = async (brandId, categoryId, productName, productPrice, productStock) => {
     const result = await db.query(
-        "INSERT INTO MsProduct (BrandID, CategoryID, ProductName, ProductPrice) VALUES ($1, $2, $3, $4) RETURNING *",
-        [brandId, categoryId, productName, productPrice]
+        "INSERT INTO MsProduct (BrandID, CategoryID, ProductName, ProductPrice, ProductStock) VALUES ($1, $2, $3, $4, $5) RETURNING *",
+        [brandId, categoryId, productName, productPrice, productStock]
     );
     return result.rows[0];
 };
 
 exports.updateProduct = async (productId, updateData) => {
-    const { brandId, categoryId, productName, productPrice } = updateData;
+    const { brandId, categoryId, productName, productPrice, productStock } = updateData;
+
     const result = await db.query(
-        "UPDATE MsProduct SET BrandID = $1, CategoryID = $2, ProductName = $3, ProductPrice = $4 WHERE ProductID = $5 RETURNING *",
-        [brandId, categoryId, productName, productPrice, productId]
+        `UPDATE MsProduct SET BrandID = $1, CategoryID = $2, ProductName = $3, ProductPrice = $4, ProductStock = $5 WHERE ProductID = $6
+         RETURNING *`,
+        [brandId, categoryId, productName, productPrice, productStock, productId]
     );
     return result.rows[0];
 };

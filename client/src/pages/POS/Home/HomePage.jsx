@@ -6,42 +6,40 @@ import { productAPI, transactionAPI } from '../../../services/apiService';
 
 const transactionId = "A9461F";
 
-// Categories function - ADD THIS
 const Categories = () => {
     return ["Fruit", "Beverage", "Snack", "Dairy", "Meat", "Vegetable", "Bakery", "Frozen"];
 };
 
-// Keep hardcoded products as fallback
 const Products = [
     {
         image: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Cavendish_Banana_DS.jpg/1200px-Cavendish_Banana_DS.jpg",
-        title: "Banana",
+        title: "Pisang",
         category: "Fruit",
-        price: 1.99,
+        price: 30000,
         id: 1,
         stock: 50
     },
     {
         image: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Red_Apple.jpg/800px-Red_Apple.jpg",
-        title: "Apple",
+        title: "Apel",
         category: "Fruit", 
-        price: 2.49,
+        price: 37000,
         id: 2,
         stock: 30
     },
     {
         image: "https://via.placeholder.com/150",
-        title: "Orange Juice",
+        title: "Jus Jeruk",
         category: "Beverage",
-        price: 2.99,
+        price: 45000,
         id: 3,
         stock: 25
     },
     {
         image: "https://via.placeholder.com/150",
-        title: "Potato Chips",
+        title: "Keripik Kentang",
         category: "Snack",
-        price: 1.99,
+        price: 30000,
         id: 4,
         stock: 40
     }
@@ -54,20 +52,18 @@ export default function HomePage() {
     const [selectedCategory, setSelectedCategory] = useState("All");
     const [loading, setLoading] = useState(false);
     const { user } = useAuth();
-
-    // Fetch products from API
+    
     useEffect(() => {
         const fetchProducts = async () => {
             try {
                 setLoading(true);
                 const response = await productAPI.getAll();
                 if (response.data.products && response.data.products.length > 0) {
-                    // Transform API data to match your component structure
                     const apiProducts = response.data.products.map(product => ({
                         image: "https://via.placeholder.com/150",
                         title: product.productname,
                         category: product.categoryname || "General",
-                        price: product.productprice, // Remove /100 if storing as dollars
+                        price: product.productprice,
                         id: product.productid,
                         stock: product.productstock
                     }));
@@ -76,7 +72,6 @@ export default function HomePage() {
                 }
             } catch (error) {
                 console.error('Failed to fetch products:', error);
-                // Keep using hardcoded products as fallback
             } finally {
                 setLoading(false);
             }
@@ -169,7 +164,7 @@ export default function HomePage() {
                                     <div className="flex justify-between items-end">
                                         <div className="flex flex-col gap-1">
                                             <h1 className="font-bold text-xl">{item.title}</h1>
-                                            <p className="text-gray-500">${item.price}</p>
+                                            <p className="text-gray-500">Rp {item.price.toLocaleString('id-ID')}</p>
                                             <p className="text-sm text-gray-400">Stock: {item.stock || 0}</p>
                                         </div>
                                         <button
@@ -204,7 +199,7 @@ export default function HomePage() {
                                         </div>
                                         <div className="flex flex-col flex-grow gap-2">
                                             <h1 className="font-bold text-xl">{item.title}</h1>
-                                            <p className="text-gray-500">${item.price}</p>
+                                            <p className="text-gray-500">Rp {item.price.toLocaleString('id-ID')}</p>
                                             <div className="flex items-center gap-2 mt-2">
                                                 <button
                                                     className="bg-gray-300 hover:bg-gray-400 rounded w-8 h-8 text-xl cursor-pointer"
@@ -221,7 +216,7 @@ export default function HomePage() {
                                                 </button>
                                             </div>
                                         </div>
-                                        <p className="font-bold text-xl">${(item.price * item.quantity).toFixed(2)}</p>
+                                        <p className="font-bold text-xl">Rp {(item.price * item.quantity).toLocaleString('id-ID')}</p>
                                     </div>
                                 ))
                             ) : (
@@ -233,15 +228,15 @@ export default function HomePage() {
                         <div className="flex flex-col justify-between gap-2 p-5 border-t">
                             <div className="flex justify-between items-center">
                                 <h1 className="text-gray-800 text-xl">SubTotal</h1>
-                                <p>${subTotal.toFixed(2)}</p>
+                                <p>Rp {subTotal.toLocaleString('id-ID')}</p>
                             </div>
                             <div className="flex justify-between items-center">
                                 <h1>Tax (10%)</h1>
-                                <p>${tax.toFixed(2)}</p>
+                                <p>Rp {tax.toLocaleString('id-ID')}</p>
                             </div>
                             <div className="flex justify-between items-center">
                                 <h1 className="font-bold text-xl">Total</h1>
-                                <p className="font-bold text-2xl">${total.toFixed(2)}</p>
+                                <p className="font-bold text-2xl">Rp {total.toLocaleString('id-ID')}</p>
                             </div>
                         </div>
                         <div className="px-5">
