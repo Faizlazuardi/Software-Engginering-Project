@@ -1,98 +1,128 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import POSLayout from "../../../layouts/POSLayout";
 import { useCart } from '../../../contexts/cartContext';
+import { useAuth } from '../../../contexts/authContext';
+import { productAPI, transactionAPI } from '../../../services/apiService';
 
 const transactionId = "A9461F";
 
+// Categories function - ADD THIS
+const Categories = () => {
+    return ["Fruit", "Beverage", "Snack", "Dairy", "Meat", "Vegetable", "Bakery", "Frozen"];
+};
+
+// Keep hardcoded products as fallback
 const Products = [
     {
         image: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Cavendish_Banana_DS.jpg/1200px-Cavendish_Banana_DS.jpg",
         title: "Banana",
         category: "Fruit",
         price: 1.99,
+        id: 1,
+        stock: 50
     },
     {
         image: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Red_Apple.jpg/800px-Red_Apple.jpg",
         title: "Apple",
-        category: "Fruit",
+        category: "Fruit", 
         price: 2.49,
+        id: 2,
+        stock: 30
     },
     {
-        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/Orange-Whole.jpg/800px-Orange-Whole.jpg",
-        title: "Orange",
-        category: "Fruit",
-        price: 1.79,
-    },
-    {
-        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/Coca-Cola_logo.svg/1200px-Coca-Cola_logo.svg.png",
-        title: "Coca-Cola",
+        image: "https://via.placeholder.com/150",
+        title: "Orange Juice",
         category: "Beverage",
-        price: 1.29,
+        price: 2.99,
+        id: 3,
+        stock: 25
     },
     {
-        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/Pepsi_logo_2015.svg/1200px-Pepsi_logo_2015.svg.png",
-        title: "Pepsi",
-        category: "Beverage",
-        price: 1.29,
-    },
-    {
-        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/Mountain_Dew_logo.svg/1200px-Mountain_Dew_logo.svg.png",
-        title: "Mountain Dew",
-        category: "Beverage",
-        price: 1.29,
-    },
-    {
-        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6c/Coffee_cup_icon.svg/1200px-Coffee_cup_icon.svg.png",
-        title: "Coffee",
-        category: "Beverage",
-        price: 2.49,
-    },
-    {
-        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Chocolate_bar_icon.svg/1200px-Chocolate_bar_icon.svg.png",
-        title: "Chocolate Bar",
-        category: "Snack",
-        price: 1.99,
-    },
-    {
-        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/Potato_chips_icon.svg/1200px-Potato_chips_icon.svg.png",
+        image: "https://via.placeholder.com/150",
         title: "Potato Chips",
         category: "Snack",
-        price: 1.49,
-    },
-    {
-        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Cookie_icon.svg/1200px-Cookie_icon.svg.png",
-        title: "Cookie",
-        category: "Snack",
-        price: 0.99,
+        price: 1.99,
+        id: 4,
+        stock: 40
     }
 ];
 
-const Categories = () => {
-    return Products.reduce((acc, product) => {
-        if (!acc.includes(product.category)) {
-            acc.push(product.category);
-        }
-        return acc;
-    }, []);
-};
-
 export default function HomePage() {
     const inputRef = useRef();
+    const [products, setProducts] = useState(Products);
     const [selectedProducts, setSelectedProducts] = useState(Products);
     const [selectedCategory, setSelectedCategory] = useState("All");
+    const [loading, setLoading] = useState(false);
+    const { user } = useAuth();
+
+    // Fetch products from API
+    useEffect(() => {
+        const fetchProducts = async () => {
+            try {
+                setLoading(true);
+                const response = await productAPI.getAll();
+                if (response.data.products && response.data.products.length > 0) {
+                    // Transform API data to match your component structure
+                    const apiProducts = response.data.products.map(product => ({
+                        image: "https://via.placeholder.com/150",
+                        title: product.productname,
+                        category: product.categoryname || "General",
+                        price: product.productprice, // Remove /100 if storing as dollars
+                        id: product.productid,
+                        stock: product.productstock
+                    }));
+                    setProducts(apiProducts);
+                    setSelectedProducts(apiProducts);
+                }
+            } catch (error) {
+                console.error('Failed to fetch products:', error);
+                // Keep using hardcoded products as fallback
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchProducts();
+    }, []);
 
     const updateProductListByCategory = (category) => {
         if (category === "All") {
-            setSelectedProducts(Products);
+            setSelectedProducts(products);
             setSelectedCategory("All");
-            return Products;
+            return;
         }
-        const filteredProducts = Products.filter(product => product.category === category);
+        const filteredProducts = products.filter(product => product.category === category);
         setSelectedProducts(filteredProducts);
         setSelectedCategory(category);
     };
 
-    const { cart, addToCart, removeFromCart, subTotal, tax, total } = useCart();
+    const { cart, addToCart, removeFromCart, subTotal, tax, total, clearCart } = useCart();
+
+    const handlePayment = async (paymentMethod) => {
+        if (cart.length === 0) {
+            alert('Please add items to cart first');
+            return;
+        }
+
+        try {
+            const transactionData = {
+                userId: user?.userid || user?.id,
+                paymentMethod: paymentMethod,
+                items: cart.map(item => ({
+                    productId: item.id,
+                    quantity: item.quantity
+                }))
+            };
+
+            const response = await transactionAPI.create(transactionData);
+            clearCart();
+            alert('Payment successful! Transaction ID: ' + response.data.transactionId);
+            
+        } catch (error) {
+            console.error('Payment failed:', error);
+            alert('Payment failed. Please try again.');
+        }
+    };
 
     return (
         <POSLayout>
@@ -101,9 +131,11 @@ export default function HomePage() {
                     <div className="flex justify-between items-center p-10">
                         <div className="flex items-center gap-5">
                             <button 
-                                className={` hover:bg-gray-600 px-5 py-3 rounded-full text-white text-xl ${selectedCategory === "All" ? "bg-black": "bg-gray-400"}`}
+                                className={`hover:bg-gray-600 px-5 py-3 rounded-full text-white text-xl ${selectedCategory === "All" ? "bg-black": "bg-gray-400"}`}
                                 onClick={() => updateProductListByCategory("All")}
-                            >All Items</button>
+                            >
+                                All Items
+                            </button>
                             {Categories().map((category, index) => (
                                 <button
                                     key={index}
@@ -119,9 +151,13 @@ export default function HomePage() {
                             <input ref={inputRef} className="border-0 outline-none w-full" type="text" name="" id="" placeholder="Search..." />
                         </div>
                     </div>
-                    <div className="gap-5 grid grid-cols-4 p-10">
-                        {
-                            selectedProducts.map((item, index) => (
+                    {loading ? (
+                        <div className="flex justify-center items-center h-64">
+                            <div className="text-xl">Loading products...</div>
+                        </div>
+                    ) : (
+                        <div className="gap-5 grid grid-cols-4 p-10">
+                            {selectedProducts.map((item, index) => (
                                 <div key={index} className="flex flex-col gap-2 bg-white shadow-lg p-4 rounded-2xl w-60 h-50">
                                     <div className="border rounded-md w-50 h-25">
                                         <img
@@ -134,18 +170,20 @@ export default function HomePage() {
                                         <div className="flex flex-col gap-1">
                                             <h1 className="font-bold text-xl">{item.title}</h1>
                                             <p className="text-gray-500">${item.price}</p>
+                                            <p className="text-sm text-gray-400">Stock: {item.stock || 0}</p>
                                         </div>
                                         <button
                                             onClick={() => addToCart(item)}
-                                            className="flex justify-center items-center hover:bg-gray-200 px-1.5 pt-0.5 pb-1.5 border-2 border-black rounded-full w-5 h-5 text-2xl cursor-pointer select-none"
+                                            className="flex justify-center items-center hover:bg-gray-200 px-1.5 pt-0.5 pb-1.5 border-2 border-black rounded-full w-5 h-5 text-2xl cursor-pointer select-none disabled:bg-gray-300 disabled:cursor-not-allowed"
+                                            disabled={!item.stock || item.stock === 0}
                                         >
                                             +
                                         </button>
                                     </div>
                                 </div>
-                            ))
-                        }
-                    </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
                 <div className="flex flex-col flex-[1] justify-between bg-white border-l-2">
                     <div className="flex flex-col flex-grow overflow-hidden">
@@ -154,41 +192,41 @@ export default function HomePage() {
                             <p>Transaction {transactionId}</p>
                         </div>
                         <div className="flex flex-col flex-grow gap-5 px-10 max-w-full overflow-y-auto overscroll-y-none">
-                            {
-                                cart.length !== 0 ? 
-                                (
-                                    cart.map((item, index) => (
-                                        <div className="flex items-center gap-5 p-5 border-b" key={index}>
-                                            <div className="border rounded-md w-20 h-20">
-                                                <img
-                                                    src={item.image}
-                                                    alt="product"
-                                                    className="rounded-md w-full h-full object-cover pointer-events-none"
-                                                />
-                                            </div>
-                                            <div className="flex flex-col flex-grow gap-2">
-                                                <h1 className="font-bold text-xl">{item.title}</h1>
-                                                <p className="text-gray-500">{item.price}</p>
-                                                <div className="flex items-center gap-2 mt-2">
-                                                    <button
-                                                        className="bg-gray-300 rounded w-8 h-8 text-xl cursor-pointer"
-                                                        onClick={() => removeFromCart(item)}
-                                                    >
-                                                        -
-                                                    </button>
-                                                    <span>{item.quantity}</span>
-                                                    <button
-                                                        className="bg-gray-300 rounded w-8 h-8 text-xl cursor-pointer"
-                                                        onClick={() => addToCart(item)}
-                                                    >
-                                                        +
-                                                    </button>
-                                                </div>
+                            {cart.length !== 0 ? (
+                                cart.map((item, index) => (
+                                    <div className="flex items-center gap-5 p-5 border-b" key={index}>
+                                        <div className="border rounded-md w-20 h-20">
+                                            <img
+                                                src={item.image}
+                                                alt="product"
+                                                className="rounded-md w-full h-full object-cover pointer-events-none"
+                                            />
+                                        </div>
+                                        <div className="flex flex-col flex-grow gap-2">
+                                            <h1 className="font-bold text-xl">{item.title}</h1>
+                                            <p className="text-gray-500">${item.price}</p>
+                                            <div className="flex items-center gap-2 mt-2">
+                                                <button
+                                                    className="bg-gray-300 hover:bg-gray-400 rounded w-8 h-8 text-xl cursor-pointer"
+                                                    onClick={() => removeFromCart(item)}
+                                                >
+                                                    -
+                                                </button>
+                                                <span className="mx-2 font-semibold">{item.quantity}</span>
+                                                <button
+                                                    className="bg-gray-300 hover:bg-gray-400 rounded w-8 h-8 text-xl cursor-pointer"
+                                                    onClick={() => addToCart(item)}
+                                                >
+                                                    +
+                                                </button>
                                             </div>
                                         </div>
-                                    ))
-                                ) : (<p className="text-gray-500">No items in cart.</p>)
-                            }
+                                        <p className="font-bold text-xl">${(item.price * item.quantity).toFixed(2)}</p>
+                                    </div>
+                                ))
+                            ) : (
+                                <p className="text-gray-500 text-center py-10">No items in cart.</p>
+                            )}
                         </div>
                     </div>
                     <div>
@@ -207,15 +245,27 @@ export default function HomePage() {
                             </div>
                         </div>
                         <div className="px-5">
-                            <button className="bg-black hover:bg-gray-800 px-5 py-3 rounded-md w-full font-medium text-white text-xl cursor-pointer">
+                            <button 
+                                className="bg-black hover:bg-gray-800 px-5 py-3 rounded-md w-full font-medium text-white text-xl cursor-pointer disabled:bg-gray-500 disabled:cursor-not-allowed"
+                                onClick={() => handlePayment('face_payment')}
+                                disabled={cart.length === 0}
+                            >
                                 Pay with Face Payment
                             </button>
                         </div>
                         <div className="flex gap-3 p-5">
-                            <button className="bg-black hover:bg-gray-800 py-3 rounded-md w-full font-medium text-white text-xl cursor-pointer">
+                            <button 
+                                className="bg-black hover:bg-gray-800 py-3 rounded-md w-full font-medium text-white text-xl cursor-pointer disabled:bg-gray-500 disabled:cursor-not-allowed"
+                                onClick={() => handlePayment('card')}
+                                disabled={cart.length === 0}
+                            >
                                 Card
                             </button>
-                            <button className="bg-black hover:bg-gray-800 py-3 rounded-md w-full font-medium text-white text-xl cursor-pointer">
+                            <button 
+                                className="bg-black hover:bg-gray-800 py-3 rounded-md w-full font-medium text-white text-xl cursor-pointer disabled:bg-gray-500 disabled:cursor-not-allowed"
+                                onClick={() => handlePayment('cash')}
+                                disabled={cart.length === 0}
+                            >
                                 Cash
                             </button>
                         </div>

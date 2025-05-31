@@ -5,7 +5,8 @@
 	"scripts": {
 		"start": "node index.js",
 		"dev": "nodemon index.js",
-		"lint": "npx @biomejs/biome check --write"
+		"lint": "npx @biomejs/biome check --write",
+		"create-admin": "node scripts/createAdmin.js"
 	},
 	"keywords": [],
 	"author": "",

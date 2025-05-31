@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { useAuth } from '../../contexts/authContext';
 
 export default function CustomerSignIn() {
-        const [error, setError] = useState('');
+    const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
+    const { login } = useAuth();
 
     const [signInForm, setsignInForm] = useState({
         email: '',
@@ -25,23 +26,26 @@ export default function CustomerSignIn() {
         setLoading(true);
         setError('');
         
-        try {
-            const response = await axios.post('http://localhost:5000/api/auth/login', signInForm);
-            
-            localStorage.setItem('token', response.data.token);
-            
-            if (response.data.user) {
-                localStorage.setItem('user', JSON.stringify(response.data.user));
-            }
-            
+        if (!signInForm.email || !signInForm.password) {
+            setError('Email and password are required');
             setLoading(false);
-            
-            navigate('/dashboard');
-            
-        } catch (error) {
-            setLoading(false);
-            setError(error.message);
+            return;
         }
+
+        const result = await login(signInForm.email, signInForm.password);
+        
+        if (result.success) {
+            // Customer login - redirect to customer dashboard or POS based on role
+            if (result.user.role === 'admin' || result.user.userrole === 'admin') {
+                navigate('/pos');
+            } else {
+                navigate('/dashboard'); // Create a customer dashboard
+            }
+        } else {
+            setError(result.error);
+        }
+        
+        setLoading(false);
     };
 
     return (
@@ -105,7 +109,7 @@ export default function CustomerSignIn() {
                     <i className="fa-brands fa-facebook"></i> Facebook
                 </button>
             </div>
-            <p className="cursor-pointer">Don’t have an account? <strong><a href="/register">Sign Up</a></strong></p>
+            <p className="cursor-pointer">Don't have an account? <strong><a href="/register">Sign Up</a></strong></p>
         </div>
     );
 }

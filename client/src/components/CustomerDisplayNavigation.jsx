@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
+import { useAuth } from '../contexts/authContext';
 
-export default function POSNavigation() {
+export default function CustomerDisplayNavigation() {
     const [time, setTime] = useState(getCurrentTime());
+    const { user } = useAuth();
     
     function getCurrentTime() {
         const now = new Date();
@@ -13,11 +15,11 @@ export default function POSNavigation() {
     }
     
     useEffect(() => {
-    const interval = setInterval(() => {
-        setTime(getCurrentTime());
-    }, 1000);
-    
-    return () => clearInterval(interval);
+        const interval = setInterval(() => {
+            setTime(getCurrentTime());
+        }, 1000);
+        
+        return () => clearInterval(interval);
     }, []);
 
     return (
@@ -25,7 +27,7 @@ export default function POSNavigation() {
             <h1 className="text-3xl">SuperMart POS</h1>
             <div className="flex space-x-10">                
                 <h1 className="text-gray-500"><i className="fa-regular fa-clock"></i> {time}</h1>
-                <h1 className="text-gray-500">Cashier : John Mama</h1>
+                <h1 className="text-gray-500">Cashier: {user?.username || 'System'}</h1>
             </div>
         </nav>
     );

@@ -10,7 +10,12 @@ app.use(express.json());
 
 // Routes
 const authRoutes = require("./routes/authRoutes");
+const transactionRoutes = require("./routes/transactionRoutes");
+const productRoutes = require("./routes/productRoutes");
+
 app.use("/api/auth", authRoutes);
+app.use("/api/transactions", transactionRoutes);
+app.use("/api/products", productRoutes);
 
 app.use(handleJsonErrors);
 
